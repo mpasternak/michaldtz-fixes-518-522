@@ -524,14 +524,23 @@ class AVbinSource(StreamingSource):
                 print 'Queued packet', _
         return True
 
+    old_stamp = None
+
     def get_next_video_timestamp(self):
         if not self.video_format:
             return
 
         if self._ensure_video_packets():
+            next_stamp = self._video_packets[0].timestamp
+
             if _debug:
-                print 'Next video timestamp is', self._video_packets[0].timestamp
-            return self._video_packets[0].timestamp
+                print 'Next video timestamp is', next_stamp
+
+            if self.old_stamp == next_stamp:
+                return
+            self.old_stamp = next_stamp
+
+            return next_stamp
 
     def get_next_video_frame(self):
         if not self.video_format:
